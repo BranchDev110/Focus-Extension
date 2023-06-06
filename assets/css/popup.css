@@ -1,0 +1,116 @@
+:root {
+  --primary-back-color: #064439;
+  --primary-text-color: #EEE7CE;
+}
+
+@font-face {
+  font-family: "Kalameh";
+  src: url('../Kalameh/Kalameh.ttf');
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: 'Kalameh';
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 400px;
+  height: 600px;
+  background-color: var(--primary-back-color);
+  color: var(--primary-text-color);
+}
+
+p {
+  font-size: 48px;
+}
+
+.timer__head > p {
+  letter-spacing: 5;
+  font-size: 60px;
+  line-height: 120px;
+}
+
+.circle {
+  fill: transparent;
+  stroke: var(--primary-text-color);
+}
+
+.timerdisplay {
+  position: relative;
+}
+
+.counttext {
+  fill: var(--primary-text-color);
+  font-size: 40px;
+  letter-spacing: 2;
+}
+
+.timelabel {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.timelabel > p {
+  display: inline-block;
+  line-height: 60px;
+  font-size: 60px;
+}
+
+.indicator {
+  fill: var(--primary-text-color);
+}
+
+.timercontrol__group > button {
+  outline: none;
+  padding: 10px;
+  width: 70px;
+  background-color: var(--primary-text-color);
+  color: var(--primary-back-color);
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 10px;
+  transition: all 0.3s ease;
+}
+
+.timercontrol__group > button:hover {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.timercontrol__input {
+  display: flex;
+  justify-content: center;
+}
+
+.timercontrol__input > input {
+  width: 60px;
+  background: none;
+  outline: none;
+  border: none;
+  padding: 10px;
+  margin: 10px;
+  font-size: 1rem;
+  border-bottom: 1px solid var(--primary-text-color);
+  color: var(--primary-text-color);
+}
+
+.timer__backlogo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -60%);
+}
+
+.timer__backlogo > img {
+  width: 400px;
+  height: 400px;
+  opacity: 0.05;
+}

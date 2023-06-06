@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="./assets/css/popup.css"/>
+  </head>
+  <body>
+    <div class="container">
+      <div class="timer__head">
+        <p>FOCUS</p>
+      </div>
+      <div class="timerdisplay">
+        <svg width="300" height="300" id="svgelement">
+          <circle
+            class="circle"
+            cx="150"
+            cy="150"
+            r="145"
+            stroke-width="2"
+            stroke-dasharray="5,5"
+            stroke-linecap="round"
+          />
+          <circle
+            id="animatedCircle"
+            class="circle"
+            cx="150"
+            cy="150"
+            r="145"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-dasharray="100"
+            stroke-dashoffset="200"
+            transform="rotate(-90, 150, 150)"
+          />
+          <circle class="indicator" id="indicatorCircle" r="5" />
+        </svg>
+        <div class="timer__backlogo">
+          <img src="./assets/logo-no-background.svg"/>
+        </div>
+        <div class="timelabel">
+          <p id="hour">00</p>
+          <p>:</p>
+          <p id="minute">00</p>
+          <p>:</p>
+          <p id="second">00</p>
+        </div>
+      </div>
+      <div class="timercontrol">
+        <div class="timercontrol__input">
+          <input type="number" value="0" id="hourinput" />
+          <input type="number" value="0" id="minuteinput" />
+        </div>
+        <div class="timercontrol__group">
+          <button id="resetbutton">
+            Reset
+          </button>
+          <button id="playbutton">
+            Play
+          </button>
+          <button id="recordbutton">
+            Record
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="./assets/js/popup.js"></script>
+  </body>
+</html>
