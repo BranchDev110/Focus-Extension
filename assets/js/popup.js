@@ -1,9 +1,12 @@
-var timerId = -1;
-
+var isPlaying = false;
 var totalTime = 0;
 var current = 0;
+var timerId = -1;
 
-var dashArray, dashOffset;
+var r = 145;
+
+var dashArray = r * Math.PI * 2
+var dashOffset;
 
 var hour, minute, second, hourinput, minuteinput, playbtn, resetbtn, recordbtn;
 
@@ -14,31 +17,29 @@ second = document.getElementById("second");
 hourinput = document.getElementById("hourinput");
 minuteinput = document.getElementById("minuteinput");
 
-resetbtn = document.getElementById('resetbutton');
-recordbtn = document.getElementById('recordbutton');
+resetbtn = document.getElementById("resetbutton");
+recordbtn = document.getElementById("recordbutton");
 playbtn = document.getElementById("playbutton");
 
-resetbtn.addEventListener('click', handleReset);
-playbtn.addEventListener('click', handlePlay);
-recordbtn.addEventListener('click', handleRecord);
+resetbtn.addEventListener("click", handleReset);
+playbtn.addEventListener("click", handlePlay);
+recordbtn.addEventListener("click", handleRecord);
 
-resetUI();
-
-chrome.runtime.sendMessage({type: 'GET_TOTALTIME'});
-
-chrome.runtime.onMessage.addListener(function(request, sender, response) {
-  if(request.type === "SET_CURRENT") {
-    console.log('asdfasdf', request.payload);
-    current = request.payload;
-    animateUI();
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.type === "SET_INITIAL") {
+    current = request.payload.current;
+    totalTime = request.payload.totalTime;
+    isPlaying = request.payload.isPlaying;
+    hourinput.value = Math.floor(totalTime / 24 / 3600);
+    minuteinput.value = Math.floor((totalTime / 24 / 60) % 60);
+    resetUI();
+    if (isPlaying) timerId = setInterval(animateUI, 1000 / 24);
   }
-  if(request.type === "SET_TOTALTIME") {
-    alert(request.payload);
-    totalTime = request.payload;
-  }
-})
+});
 
-function animateUI() {
+chrome.runtime.sendMessage({ type: "GET_INITIAL" });
+
+function draw(current, totalTime) {
   hour.innerHTML = Math.floor((totalTime - current) / 24 / 3600)
     .toString(10)
     .padStart(2, "0");
@@ -53,52 +54,56 @@ function animateUI() {
   animatedCircle.setAttribute("stroke-dasharray", dashArray);
   animatedCircle.setAttribute("stroke-dashoffset", dashOffset);
 
-  indicatorCircle.setAttribute(
-    "cx",
-    150 + Math.cos((current * Math.PI * 2) / totalTime - Math.PI / 2) * 145
-  );
-  indicatorCircle.setAttribute(
-    "cy",
-    150 + Math.sin((current * Math.PI * 2) / totalTime - Math.PI / 2) * 145
-  );
+  const ang = totalTime === 0 ? 0 - Math.PI / 2 : (current * Math.PI * 2) / totalTime - Math.PI / 2;
+
+  indicatorCircle.setAttribute("cx", 150 + Math.cos(ang) * r);
+  indicatorCircle.setAttribute("cy", 150 + Math.sin(ang) * r);
+}
+
+function animateUI() {
+  current++;
+  if(current === totalTime) {
+    reset();
+    return;
+  }
+  draw(current, totalTime);
 }
 
 function resetUI() {
-  chrome.runtime.sendMessage({type: 'RESET'});
-
-  dashArray = 145 * Math.PI * 2;
-  dashOffset = dashArray;
-
-  hourinput.value = 0;
-  minuteinput.value = 0;
-
-  hour.innerHTML = Math.floor(totalTime / 24 / 3600)
-    .toString(10)
-    .padStart(2, "0");
-  minute.innerHTML = Math.floor((totalTime / 24 / 60) % 60)
-    .toString(10)
-    .padStart(2, "0");
-  second.innerHTML = Math.floor((totalTime / 24) % 60)
-    .toString(10)
-    .padStart(2, "0");
-
-  hourinput.value = 0;
-  minuteinput.value = 0;
-
-  indicatorCircle.setAttribute("cx", 150 + Math.cos(0 - Math.PI / 2) * 145);
-  indicatorCircle.setAttribute("cy", 150 + Math.sin(0 - Math.PI / 2) * 145);
-
-  animatedCircle.setAttribute("stroke-dasharray", dashArray);
-  animatedCircle.setAttribute("stroke-dashoffset", dashOffset);
+  draw(current, totalTime); 
+  changePlayBtnText();
 }
 
-function handleReset() {
+function reset() {
+  chrome.runtime.sendMessage({ type: "RESET" });
+  current = 0;
+  if(isPlaying) {
+    isPlaying = false;
+    clearInterval(timerId);
+  }
   resetUI();
 }
 
+function handleReset() {
+  reset();
+}
+
+function changePlayBtnText() {
+  if(isPlaying) playbtn.innerHTML = "Pause";
+  else playbtn.innerHTML = "Play";
+}
+
 function handlePlay() {
-  totalTime = hourinput.value * 3600 * 24 + minuteinput.value * 60 * 24;
-  chrome.runtime.sendMessage({type: 'PLAY', payload: totalTime});
+  if (!isPlaying) {
+    totalTime = hourinput.value * 3600 * 24 + minuteinput.value * 60 * 24;
+    timerId = setInterval(animateUI, 1000 / 24);
+    chrome.runtime.sendMessage({ type: "PLAY", payload: totalTime });
+  } else {
+    clearInterval(timerId);
+    chrome.runtime.sendMessage({ type: "PAUSE" });
+  }
+  isPlaying = !isPlaying;
+  changePlayBtnText();
 }
 
 function handleRecord() {}
